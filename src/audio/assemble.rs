@@ -64,6 +64,7 @@ pub fn assemble_segments(
 
 /// Mixa um batch de segmentos sobre a base de silêncio usando adelay+amix.
 /// Cada segmento é posicionado em seu start_ms absoluto.
+/// Usa effective_duration_secs quando disponível e aplica atrim para evitar colisões.
 fn mix_batch_with_adelay(
     silence_base: &Path,
     batch: &[(usize, &Path)],
@@ -100,12 +101,30 @@ fn mix_batch_with_adelay(
         let start_ms = segments[seg_idx].start_ms;
         let label = format!("s{}", i);
 
+        // Usar duração efetiva se disponível, senão usar end_ms - start_ms
+        let seg_duration_secs = segments[seg_idx]
+            .effective_duration_secs
+            .unwrap_or_else(|| segments[seg_idx].duration_secs());
+
+        // Calcular duração máxima permitida: até o início do próximo segmento
+        let max_duration_secs = if seg_idx + 1 < segments.len() {
+            let next_start_ms = segments[seg_idx + 1].start_ms;
+            let available_ms = next_start_ms.saturating_sub(start_ms);
+            available_ms as f64 / 1000.0
+        } else {
+            seg_duration_secs
+        };
+
+        // Se o segmento invade o próximo, aplicar atrim para cortar
+        let trim_duration_secs = seg_duration_secs.min(max_duration_secs);
+        let seg_duration_ms = (trim_duration_secs * 1000.0) as u64;
+
         // Aplicar fade-in (10ms) e fade-out (15ms) para evitar cliques/pops nos cortes
-        let seg_duration_ms = segments[seg_idx].end_ms.saturating_sub(segments[seg_idx].start_ms);
         let fade_out_start_ms = seg_duration_ms.saturating_sub(15);
         filter_parts.push(format!(
-            "[{}]afade=t=in:st=0:d=0.010,afade=t=out:st={:.3}:d=0.015,adelay={}|{}[{}]",
+            "[{}]atrim=0:{:.4},afade=t=in:st=0:d=0.010,afade=t=out:st={:.3}:d=0.015,adelay={}|{}[{}]",
             input_idx,
+            trim_duration_secs,
             fade_out_start_ms as f64 / 1000.0,
             start_ms,
             start_ms,

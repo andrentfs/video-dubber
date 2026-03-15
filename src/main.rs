@@ -36,9 +36,17 @@ struct Cli {
     #[arg(long, default_value = "5")]
     max_concurrent: usize,
 
-    /// Chunk duration in seconds for audio splitting (default: 300 = 5 min)
-    #[arg(long, default_value = "300")]
+    /// Chunk duration in seconds for audio splitting (default: 60 = 1 min)
+    #[arg(long, default_value = "60")]
     chunk_duration: u64,
+
+    /// Overlap in seconds between adjacent chunks (default: 10)
+    #[arg(long, default_value = "10")]
+    chunk_overlap: u64,
+
+    /// Dump detailed segment JSON at each pipeline stage for debugging
+    #[arg(long, default_value = "false")]
+    debug_segments: bool,
 }
 
 #[tokio::main]
@@ -68,6 +76,8 @@ async fn main() -> Result<()> {
     let mut config = Config::new(api_key, cli.input, cli.output, cli.voice);
     config.max_concurrent_tts = cli.max_concurrent;
     config.chunk_duration_secs = cli.chunk_duration;
+    config.chunk_overlap_secs = cli.chunk_overlap;
+    config.debug_segments = cli.debug_segments;
 
     println!("🎬 Video Dubber — Starting dubbing pipeline");
     println!("   Input:  {:?}", config.input_path);
