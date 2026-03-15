@@ -4,13 +4,24 @@
 
 ### 1. Instalar pré-requisitos
 
+**macOS / Linux:**
 ```bash
 # Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 # ffmpeg
-brew install ffmpeg
+brew install ffmpeg          # macOS
+sudo apt install ffmpeg      # Ubuntu/Debian
 ```
+
+**Windows:**
+```powershell
+# Rust — baixe e execute o instalador de https://rustup.rs
+# ffmpeg
+winget install Gyan.FFmpeg
+```
+
+> No Windows, veja o [README](../README.md#uso-no-windows) para instruções detalhadas de instalação do ffmpeg e configuração do PATH.
 
 ### 2. Compilar o projeto
 
@@ -23,13 +34,21 @@ cargo build --release
 
 Opção A — variável de ambiente:
 ```bash
+# macOS / Linux
 export OPENROUTER_API_KEY="sk-or-v1-..."
+
+# Windows (PowerShell)
+$env:OPENROUTER_API_KEY = "sk-or-v1-..."
 ```
 
-Opção B — arquivo `.env`:
-```bash
-echo "OPENROUTER_API_KEY=sk-or-v1-..." > .env
+Opção B — arquivo `.env` (todas as plataformas):
+
+Crie um arquivo `.env` na pasta de onde vai executar o programa:
 ```
+OPENROUTER_API_KEY=sk-or-v1-...
+```
+
+> **Windows:** O `.env` deve estar no diretório de trabalho atual (a pasta de onde você executa o comando).
 
 Opção C — argumento CLI:
 ```bash
@@ -108,11 +127,18 @@ cargo run --release -- -i video.mp4 -o output.wav
 
 ## Troubleshooting
 
-### "ffmpeg not found"
+### "ffmpeg not found" / "ffmpeg não é reconhecido"
 
 ```bash
+# macOS
 brew install ffmpeg
-# ou no Linux: sudo apt install ffmpeg
+
+# Linux
+sudo apt install ffmpeg
+
+# Windows
+winget install Gyan.FFmpeg
+# Ou baixe de https://www.gyan.dev/ffmpeg/builds/ e adicione ao PATH
 ```
 
 ### "OpenRouter API error (401)"
@@ -154,3 +180,5 @@ ffmpeg -i video_original.mp4 -i output.wav \
   -c:v copy -map 0:v:0 -map 1:a:0 \
   video_dubbed.mp4
 ```
+
+> **Windows:** Os mesmos comandos ffmpeg funcionam no PowerShell/CMD. Substitua `\` por `` ` `` (backtick) para quebra de linha no PowerShell, ou coloque tudo em uma linha só.
