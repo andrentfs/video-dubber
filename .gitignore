@@ -1,0 +1,12 @@
+# video-dubber temp files
+*.wav
+*.mp3
+cache_transcription.json
+cache_translation.json
+
+# Rust
+target/
+Cargo.lock
+
+# Env
+.env
