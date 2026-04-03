@@ -12,7 +12,7 @@ Extrai o áudio de um vídeo MP4, transcreve, traduz para português brasileiro 
 - 🌐 **Tradução contextual** via GPT-4.1-mini (lotes com contexto completo)
 - 🔊 **TTS natural** via GPT-4o-mini-tts (6 vozes disponíveis)
 - ⏱️ **Sincronização de timing** — cada segmento dublado respeita a duração original
-- ✂️ **Chunking automático** — vídeos longos são divididos em partes de 5 min
+- ✂️ **Chunking automático** — vídeos longos são divididos em partes de 1 min
 - ⚡ **TTS paralelo** — até 5 requests simultâneos (configurável)
 - 💾 **Cache intermediário** — transcrição e tradução salvas em JSON para retomar em caso de falha
 
@@ -176,7 +176,8 @@ video-dubber.exe --input video.mp4 --output dubbed.mp4 --voice nova
 | `--voice`, `-v` | Voz do TTS | `nova` |
 | `--api-key` | Chave API OpenRouter | env `OPENROUTER_API_KEY` |
 | `--max-concurrent` | Requests TTS simultâneos | `5` |
-| `--chunk-duration` | Duração máxima por chunk (segundos) | `300` |
+| `--chunk-duration` | Duração máxima por chunk (segundos) | `60` |
+| `--chunk-overlap` | Overlap entre chunks (segundos) | `10` |
 
 ### Vozes disponíveis
 
